@@ -56,12 +56,16 @@ public class Chessman {
 				result = moveUrHorse(new_x, new_y);
 				break;
 			case 'r': // Chariot
+				result = moveMyChariot(new_x, new_y);
 				break;
 			case 'R':
+				result = moveUrChariot(new_x, new_y);
 				break;
 			case 'c': // Cannon
+				result = moveMyCannon(new_x, new_y);
 				break;
 			case 'C':
+				result = moveUrCannon(new_x, new_y);
 				break;
 			case 's': // Soldier
 				break;
@@ -307,7 +311,7 @@ public class Chessman {
 				chess_board[ny][nx] = 'H';
 				chess_board[y][x] = 'n';
 				return 's';
-			}else if(Character.toLowerCase(temp) != temp && noObstacle){
+			}else if(Character.toUpperCase(temp) != temp && noObstacle){
 				chess_board[ny][nx] = 'H';
 				chess_board[y][x] = 'n';
 				return 'e';
@@ -336,7 +340,7 @@ public class Chessman {
 				chess_board[ny][nx] = 'H';
 				chess_board[y][x] = 'n';
 				return 's';
-			}else if(Character.toLowerCase(temp) != temp && noObstacle){
+			}else if(Character.toUpperCase(temp) != temp && noObstacle){
 				chess_board[ny][nx] = 'H';
 				chess_board[y][x] = 'n';
 				return 'e';
@@ -347,6 +351,242 @@ public class Chessman {
 			return 'f';
 		}
 	}
-
-
+	private char moveMyChariot(int nx, int ny){
+		// Rule: 1. no obstacles between source and destination.
+		if(nx <0 || nx > 8 || ny < 0 || ny > 9){
+			return 'f';
+		}
+		
+		char dest = chess_board[ny][nx];
+		
+		if(Math.abs(nx-x) > 0 && ny == y){
+			if(nx > x){
+				for(int i=x+1; i<nx; ++i){
+					if(chess_board[y][i] != 'n'){
+						return 'f'; // obstacle
+					}
+				}
+			}else if(x > nx){
+				for(int i=nx+1; i<x; ++i){
+					if(chess_board[y][i] != 'n'){
+						return 'f'; // obstacle
+					}
+				}
+			}
+			if(dest == 'n'){
+				chess_board[ny][nx] = 'r';
+				chess_board[y][x] = 'n';
+				return 's';
+			}else if(Character.toLowerCase(dest) != dest){
+				chess_board[ny][nx] = 'r';
+				chess_board[y][x] = 'n';
+				return 'e';
+			}else{
+				return 'f';
+			}
+		}else if(Math.abs(ny-y) > 0 && nx == x){
+			if(ny > y){
+				for(int i=y+1; i<ny; ++i){
+					if(chess_board[i][x] != 'n'){
+						return 'f'; // obstacle
+					}
+				}
+			}else if(y > ny){
+				for(int i=ny+1; i<y; ++i){
+					if(chess_board[i][x] != 'n'){
+						return 'f'; // obstacle
+					}
+				}
+			}
+			if(dest == 'n'){
+				chess_board[ny][nx] = 'r';
+				chess_board[y][x] = 'n';
+				return 's';
+			}else if(Character.toLowerCase(dest) != dest){
+				chess_board[ny][nx] = 'r';
+				chess_board[y][x] = 'n';
+				return 'e';
+			}else{
+				return 'f';
+			}
+		}
+		
+		return 'f';
+	}
+	private char moveUrChariot(int nx, int ny){
+		// Rule: 1. no obstacles between source and destination.
+		if(nx <0 || nx > 8 || ny < 0 || ny > 9){
+			return 'f';
+		}
+		
+		char dest = chess_board[ny][nx];
+		
+		if(Math.abs(nx-x) > 0 && ny == y){
+			if(nx > x){
+				for(int i=x+1; i<nx; ++i){
+					if(chess_board[y][i] != 'n'){
+						return 'f'; // obstacle
+					}
+				}
+			}else if(x > nx){
+				for(int i=nx+1; i<x; ++i){
+					if(chess_board[y][i] != 'n'){
+						return 'f'; // obstacle
+					}
+				}
+			}
+			if(dest == 'n'){
+				chess_board[ny][nx] = 'R';
+				chess_board[y][x] = 'n';
+				return 's';
+			}else if(Character.toUpperCase(dest) != dest){
+				chess_board[ny][nx] = 'R';
+				chess_board[y][x] = 'n';
+				return 'e';
+			}else{
+				return 'f';
+			}
+		}else if(Math.abs(ny-y) > 0 && nx == x){
+			if(ny > y){
+				for(int i=y+1; i<ny; ++i){
+					if(chess_board[i][x] != 'n'){
+						return 'f'; // obstacle
+					}
+				}
+			}else if(y > ny){
+				for(int i=ny+1; i<y; ++i){
+					if(chess_board[i][x] != 'n'){
+						return 'f'; // obstacle
+					}
+				}
+			}
+			if(dest == 'n'){
+				chess_board[ny][nx] = 'R';
+				chess_board[y][x] = 'n';
+				return 's';
+			}else if(Character.toUpperCase(dest) != dest){
+				chess_board[ny][nx] = 'R';
+				chess_board[y][x] = 'n';
+				return 'e';
+			}else{
+				return 'f';
+			}
+		}
+		return 'f';
+	}
+	private char moveMyCannon(int nx, int ny){
+		// Rule: 1. if no obstacle, can move but not eat; 2. if 1 obstacle, can fly and eat.
+		if(nx <0 || nx > 8 || ny < 0 || ny > 9){
+			return 'f';
+		}
+		
+		char dest = chess_board[ny][nx];
+		int ob = 0;
+		if(Math.abs(nx-x) > 0 && ny == y){
+			if(nx > x){
+				for(int i=x+1; i<nx; ++i){
+					if(chess_board[y][i] != 'n'){
+						++ob;
+					}
+				}
+			}else if(x > nx){
+				for(int i=nx+1; i<x; ++i){
+					if(chess_board[y][i] != 'n'){
+						++ob;
+					}
+				}
+			}
+		}else if(Math.abs(ny-y) > 0 && nx == x){
+			if(ny > y){
+				for(int i=y+1; i<ny; ++i){
+					if(chess_board[i][x] != 'n'){
+						++ob;
+					}
+				}
+			}else if(y > ny){
+				for(int i=ny+1; i<y; ++i){
+					if(chess_board[i][x] != 'n'){
+						++ob;
+					}
+				}
+			}
+		}else{
+			return 'f';
+		}
+		
+		if(ob == 0 && dest == 'n'){
+			// can only move
+			chess_board[ny][nx] = 'c';
+			chess_board[y][x] = 'n';
+			return 's';
+		}else if(ob == 1 && Character.toLowerCase(dest) != dest){
+			// can only fly and eat
+			chess_board[ny][nx] = 'c';
+			chess_board[y][x] = 'n';
+			return 'e';
+		}else{
+			return 'f';
+		}
+	}
+	private char moveUrCannon(int nx, int ny){
+		// Rule: 1. if no obstacle, can move but not eat; 2. if 1 obstacle, can fly and eat.
+		if(nx <0 || nx > 8 || ny < 0 || ny > 9){
+			return 'f';
+		}
+		
+		char dest = chess_board[ny][nx];
+		int ob = 0;
+		if(Math.abs(nx-x) > 0 && ny == y){
+			if(nx > x){
+				for(int i=x+1; i<nx; ++i){
+					if(chess_board[y][i] != 'n'){
+						++ob;
+					}
+				}
+			}else if(x > nx){
+				for(int i=nx+1; i<x; ++i){
+					if(chess_board[y][i] != 'n'){
+						++ob;
+					}
+				}
+			}
+		}else if(Math.abs(ny-y) > 0 && nx == x){
+			if(ny > y){
+				for(int i=y+1; i<ny; ++i){
+					if(chess_board[i][x] != 'n'){
+						++ob;
+					}
+				}
+			}else if(y > ny){
+				for(int i=ny+1; i<y; ++i){
+					if(chess_board[i][x] != 'n'){
+						++ob;
+					}
+				}
+			}
+		}else{
+			return 'f';
+		}
+		
+		if(ob == 0 && dest == 'n'){
+			// can only move
+			chess_board[ny][nx] = 'C';
+			chess_board[y][x] = 'n';
+			return 's';
+		}else if(ob == 1 && Character.toUpperCase(dest) != dest){
+			// can only fly and eat
+			chess_board[ny][nx] = 'C';
+			chess_board[y][x] = 'n';
+			return 'e';
+		}else{
+			return 'f';
+		}
+	}
+	private char moveMySoldier(int nx, int ny){
+		
+	}
 }
+
+
+
+
