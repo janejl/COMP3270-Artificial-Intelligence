@@ -45,4 +45,16 @@ public class ChessNode {
 	public int getDepth(){
 		return depth;
 	}
+
+	// check game status: p - play, w - win, l - lose, t - tie
+	public char getGameStatus(){
+		char st = 'p';
+		
+		return st;
+	}
+	
+	// Estimation of the current state of the game -> Search through moves and pick the “best” one.
+	public int getEvaluation(){
+		
+	}
 }

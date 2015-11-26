@@ -68,12 +68,16 @@ public class Chessman {
 				result = moveUrCannon(new_x, new_y);
 				break;
 			case 's': // Soldier
+				result = moveMySoldier(new_x, new_y);
 				break;
 			case 'S':
+				result = moveUrSoldier(new_x, new_y);
 				break;
 			case 'b': // Soldier across the river
+				result = moveMyBigSoldier(new_x, new_y);
 				break;
 			case 'B':
+				result = moveUrBigSoldier(new_x, new_y);
 		}
 		return result;
 	}
@@ -583,8 +587,127 @@ public class Chessman {
 		}
 	}
 	private char moveMySoldier(int nx, int ny){
-		
+		// Rule: 1. only move forward; 2. upgrade after cross the river
+		if(nx < 0 || nx > 8 || ny < 0 || ny > 5){
+			return 'f';
+		}
+		if(ny-y == 1 && nx == x){
+			char dest = chess_board[ny][nx];
+			
+			if(y == 4){
+				// upgrade soldier
+				if(dest == 'n'){
+					chess_board[ny][nx] = 'b';
+					chess_board[y][x] = 'n';
+					return 's';
+				}else if(Character.toLowerCase(dest) != dest){
+					chess_board[ny][nx] = 'b';
+					chess_board[y][x] = 'n';
+					return 'e';
+				}else{
+					return 'f';
+				}
+			}else{
+				if(dest == 'n'){
+					chess_board[ny][nx] = 's';
+					chess_board[y][x] = 'n';
+					return 's';
+				}else if(Character.toLowerCase(dest) != dest){
+					chess_board[ny][nx] = 's';
+					chess_board[y][x] = 'n';
+					return 'e';
+				}else{
+					return 'f';
+				}
+			}
+		}else{
+			return 'f';
+		}
 	}
+	private char moveUrSoldier(int nx, int ny){
+		if(nx < 0 || nx > 8 || ny < 4 || ny > 9){
+			return 'f';
+		}
+		if(y-ny == 1 && nx == x){
+			char dest = chess_board[ny][nx];
+			
+			if(y == 4){
+				// upgrade soldier
+				if(dest == 'n'){
+					chess_board[ny][nx] = 'B';
+					chess_board[y][x] = 'n';
+					return 's';
+				}else if(Character.toUpperCase(dest) != dest){
+					chess_board[ny][nx] = 'B';
+					chess_board[y][x] = 'n';
+					return 'e';
+				}else{
+					return 'f';
+				}
+			}else{
+				if(dest == 'n'){
+					chess_board[ny][nx] = 'S';
+					chess_board[y][x] = 'n';
+					return 's';
+				}else if(Character.toUpperCase(dest) != dest){
+					chess_board[ny][nx] = 'S';
+					chess_board[y][x] = 'n';
+					return 'e';
+				}else{
+					return 'f';
+				}
+			}
+		}else{
+			return 'f';
+		}
+	}
+	private char moveMyBigSoldier(int nx, int ny){
+		// Rule: 1. move left, right, forward
+		if(nx < 0 || nx > 8 || ny < 5 || ny > 9){
+			return 'f';
+		}
+		
+		if((ny-y == 1 && nx == x) || (Math.abs(nx-x) == 1 && ny == y)){
+			char dest = chess_board[ny][nx];
+			if(dest == 'n'){
+				chess_board[ny][nx] = 'b';
+				chess_board[y][x] = 'n';
+				return 's';
+			}else if(Character.toLowerCase(dest) != dest){
+				chess_board[ny][nx] = 'b';
+				chess_board[y][x] = 'n';
+				return 'e';
+			}else{
+				return 'f';
+			}
+		}
+		return 'f';
+	}
+	private char moveUrBigSoldier(int nx, int ny){
+		if(nx < 0 || nx > 8 || ny < 0 || ny > 4){
+			return 'f';
+		}
+		
+		if((y-ny == 1 && nx == x) || (Math.abs(nx-x) == 1 && ny == y)){
+			char dest = chess_board[ny][nx];
+			if(dest == 'n'){
+				chess_board[ny][nx] = 'B';
+				chess_board[y][x] = 'n';
+				return 's';
+			}else if(Character.toUpperCase(dest) != dest){
+				chess_board[ny][nx] = 'B';
+				chess_board[y][x] = 'n';
+				return 'e';
+			}else{
+				return 'f';
+			}
+		}
+		return 'f';
+	}
+	
+
+
+
 }
 
 
