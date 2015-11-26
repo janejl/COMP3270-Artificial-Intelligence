@@ -1,0 +1,20 @@
+Methodology:
+1. Search engine: DFS with limit
+下次我们讨论Alpha-Beta搜索时，会发现深度优先的遍历会有很大的优势，你可以用目前得到的信息来决定某些结点是不需要访问的，这样就节省下很多的时间。
+
+
+2. α-β pruning
+3. Heuristics
+4. Evaluation
+5. Number of look ahead steps
+6. DB?
+
+
+Reference:
+1. https://en.wikipedia.org/wiki/Xiangqi
+
+2. http://www.xqbase.com/computer/outline.htm
+
+3. http://skookumpete.com/chess_intro.htm#setup
+
+4. https://chessprogramming.wikispaces.com/FirstChess
