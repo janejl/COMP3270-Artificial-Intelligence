@@ -7,6 +7,10 @@ public class ChessNode {
 	private ChessNode parent_node;
 	private int depth;
 	
+	private int h; // estimated cost to goal
+	private int g; // cost so far to reach this node
+	private int f; // estimated total cost of path from initial to goal
+	
 	// root constructor
 	public ChessNode(char[][] chess_board, boolean machine_turn, ArrayList<Chessman> chessman_list){
 		this.chess_board = chess_board;
@@ -55,6 +59,8 @@ public class ChessNode {
 	
 	// Estimation of the current state of the game -> Search through moves and pick the “best” one.
 	public int getEvaluation(){
+		int sum = 0;
 		
+		return sum;
 	}
 }

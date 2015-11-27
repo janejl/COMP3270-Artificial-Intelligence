@@ -1,12 +1,13 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class ChineseChess {
 
-	private char[][] chess_board;
+	private static char[][] chess_board;
 	private ArrayList<ChessNode> history;
-	private boolean isMyTurn; // Machine's turn
-	private ArrayList<Chessman> myChessmen;
-	private ArrayList<Chessman> userChessmen;
+	private static boolean isMyTurn; // Machine's turn
+	private static ArrayList<Chessman> myChessmen;
+	private static ArrayList<Chessman> userChessmen;
 	
 	/* 
 	 * Human will take the first turn in default.
@@ -15,13 +16,43 @@ public class ChineseChess {
 		initChessBoard();
 		isMyTurn = false;
 		history = new ArrayList<ChessNode>();
+		initChessBoard();
 	}
 	
 	public static void main(String[] args) {
         System.out.println("=========================== Game Start ===========================");
+        Scanner scanner = new Scanner(System.in);
         
         ChineseChess game = new ChineseChess();
         game.printChessBoard();
+        
+        isMyTurn = true;
+        
+        int i, x, y;
+        String[] digit;
+        char result;
+        while(true){
+	        printOption(isMyTurn);
+	        if(isMyTurn) System.out.print("Green's turn >>>");
+	        else System.out.print("Red's turn >>>");
+	        digit = scanner.nextLine().split(" ");
+	        i = Integer.parseInt(digit[0]);
+			x = Integer.parseInt(digit[1]);
+		    y = Integer.parseInt(digit[2]);
+		    if(i < 0){
+		    	break;
+		    }
+		    if(isMyTurn){
+		    	result = game.myChessmen.get(i).move(chess_board, x, y);
+		    }else{
+		    	result = game.userChessmen.get(i).move(chess_board, x, y);
+		    }
+	        System.out.println("Result:" + result);
+	        game.printChessBoard();
+	        if(result != 'f'){
+	        	isMyTurn = !isMyTurn;
+	        }
+        }
         
         System.out.println("=========================== Game End ===========================");
 	}
@@ -123,13 +154,13 @@ public class ChineseChess {
 		myChessmen.add(piece);
 		chess_board[3][2] = 's';
 		piece = new Chessman('s', 2, 3);
-		userChessmen.add(piece);
+		myChessmen.add(piece);
 		chess_board[3][4] = 's';
 		piece = new Chessman('s', 4, 3);
 		myChessmen.add(piece);
 		chess_board[3][6] = 's';
 		piece = new Chessman('s', 6, 3);
-		userChessmen.add(piece);
+		myChessmen.add(piece);
 		chess_board[3][8] = 's';
 		piece = new Chessman('s', 8, 3);
 		myChessmen.add(piece);
@@ -138,20 +169,33 @@ public class ChineseChess {
 		userChessmen.add(piece);
 		chess_board[6][2] = 'S';
 		piece = new Chessman('S', 2, 6);
-		myChessmen.add(piece);
+		userChessmen.add(piece);
 		chess_board[6][4] = 'S';
 		piece = new Chessman('S', 4, 6);
 		userChessmen.add(piece);
 		chess_board[6][6] = 'S';
 		piece = new Chessman('S', 6, 6);
-		myChessmen.add(piece);
+		userChessmen.add(piece);
 		chess_board[6][8] = 'S';
 		piece = new Chessman('S', 8, 6);
 		userChessmen.add(piece);
 	}
-	
+	public static void printOption(boolean machineTurn){
+		if(machineTurn){
+			for(int i=0; i<myChessmen.size(); ++i){
+				System.out.println("option: " + i + " " + myChessmen.get(i));
+			}
+		}else{
+			for(int i=0; i<userChessmen.size(); ++i){
+				System.out.println("option: " + i + " " + userChessmen.get(i));
+			}
+		}
+		System.out.print("Type in option number and destination (e.g.: 0 4 1), quit by enter -1 0 0: ");
+	}
 	public void printChessBoard(){
+		System.out.println(" 0 1 2 3 4 5 6 7 8");
 		for(int j=0; j<10; ++j){
+			System.out.print("\033[0m"+j);
 			for(int i=0; i<9; ++i){
 				switch(chess_board[j][i]){
 					case 'n':
@@ -206,7 +250,7 @@ public class ChineseChess {
 						System.out.print("\033[31m兵");
 				}
 			}
-			System.out.println("\033[32m");
+			System.out.println("\033[0m");
 		}
 	}
 }

@@ -79,16 +79,41 @@ public class Chessman {
 			case 'B':
 				result = moveUrBigSoldier(new_x, new_y);
 		}
+		if(result == 's' || result == 'e'){
+			x = new_x;
+			y = new_y;
+		}
 		return result;
 	}
 
 	private char moveMyGeneral(int nx, int ny){
-		// Rule: 1. within palace; 2. one square every step.
-		if(nx < 3 || nx > 5 || ny < 0 || ny > 2){
+		// Rule: 1. within palace; 2. one square every step; 3. fly and eat when meet enemy's general.
+		if(nx <0 || nx > 8 || ny < 0 || ny > 9){
+			System.out.println("Fail: out of scope");
 			return 'f';
 		}
+		
+		char temp = chess_board[ny][nx];
+		if(temp == 'G' && nx == x && ny > 6 && ny < 10){
+			for(int i=y+1; i<ny; ++i){
+				if(chess_board[i][x] != 'n'){
+					System.out.println("Fail: cannot fly and eat, obstacle in ("+ x + ", "+i+")");
+					return 'f'; // obstacle
+				}
+			}
+			
+			chess_board[ny][nx] = 'g';
+			chess_board[y][x] = 'n';
+			return 'e';
+		}
+		
+		// General won't fly and eat, check normal case:
+		if(nx < 3 || nx > 5 || ny < 0 || ny > 2){
+			System.out.println("Fail: out of palace");
+			return 'f';
+		}
+		
 		if((Math.abs(nx-x) == 1 && (ny-y) == 0) || (Math.abs(ny-y) == 1 && (nx-x) == 0)){
-			char temp = chess_board[ny][nx];
 			if(temp == 'n'){
 				chess_board[ny][nx] = 'g';
 				chess_board[y][x] = 'n';
@@ -98,18 +123,39 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail: space is taken by other soldier");
 				return 'f';
 			}
 		}else{
+			System.out.println("Fail: wrong number of steps");
 			return 'f';
 		}
 	}
 	private char moveUrGeneral(int nx, int ny){
+		if(nx <0 || nx > 8 || ny < 0 || ny > 9){
+			System.out.println("Fail: out of scope");
+			return 'f';
+		}
+		
+		char temp = chess_board[ny][nx];
+		if(temp == 'g' && nx == x && ny >= 0 && ny < 3){
+			for(int i=ny+1; i<y; ++i){
+				if(chess_board[i][x] != 'n'){
+					System.out.println("Fail: cannot fly and eat, obstacle in ("+ x + ", "+i+")");
+					return 'f'; // obstacle
+				}
+			}
+			chess_board[ny][nx] = 'G';
+			chess_board[y][x] = 'n';
+			return 'e';
+		}
+		
+		// General won't fly and eat, check normal case:
 		if(nx < 3 || nx > 5 || ny < 7 || ny > 9){
+			System.out.println("Fail: out of palace");
 			return 'f';
 		}
 		if((Math.abs(nx-x) == 1 && (ny-y) == 0) || (Math.abs(ny-y) == 1 && (nx-x) == 0)){
-			char temp = chess_board[ny][nx];
 			if(temp == 'n'){
 				chess_board[ny][nx] = 'G';
 				chess_board[y][x] = 'n';
@@ -119,15 +165,18 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail: space is taken by other soldier");
 				return 'f';
 			}
 		}else{
+			System.out.println("Fail: wrong number of steps");
 			return 'f';
 		}
 	}
 	private char moveMyAdvisor(int nx, int ny){
 		// Rule: 1. within palace; 2. one diagonal one step.
 		if(nx < 3 || nx > 5 || ny < 0 || ny > 2){
+			System.out.println("Fail 1");
 			return 'f';
 		}
 		if(Math.abs(nx-x) == 1 && Math.abs(ny-y) == 1){
@@ -141,14 +190,17 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail 2");
 				return 'f';
 			}
 		}else{
+			System.out.println("Fail 3");
 			return 'f';
 		}
 	}
 	private char moveUrAdvisor(int nx, int ny){
 		if(nx < 3 || nx > 5 || ny < 7 || ny > 9){
+			System.out.println("Fail 1");
 			return 'f';
 		}
 		if(Math.abs(nx-x) == 1 && Math.abs(ny-y) == 1){
@@ -162,18 +214,21 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail 2");
 				return 'f';
 			}
 		}else{
+			System.out.println("Fail 3");
 			return 'f';
 		}
 	}
 	private char moveMyElephant(int nx, int ny){
-		// Rule: 1. cannot across river; 2. two diagonals one step.
+		// Rule: 1. cannot across river; 2. two diagonals one step; 3. no obstacle in center of 田.
 		if(nx < 0 || nx > 8 || ny < 0 || ny > 4){
 			return 'f';
 		}
-		if(Math.abs(nx-x) == 2 && Math.abs(ny-y) == 2){
+		char check_center = chess_board[(ny+y)/2][(nx+x)/2];
+		if(Math.abs(nx-x) == 2 && Math.abs(ny-y) == 2 && check_center == 'n'){
 			char temp = chess_board[ny][nx];
 			if(temp == 'n'){
 				chess_board[ny][nx] = 'e';
@@ -191,10 +246,13 @@ public class Chessman {
 		}
 	}
 	private char moveUrElephant(int nx, int ny){
+		// Rule: 1. cannot across river; 2. two diagonals one step; 3. no obstacle in center of 田.
 		if(nx < 0 || nx > 8 || ny < 5 || ny > 9){
+			System.out.println("Fail 1");
 			return 'f';
 		}
-		if(Math.abs(nx-x) == 2 && Math.abs(ny-y) == 2){
+		char check_center = chess_board[(ny+y)/2][(nx+x)/2];
+		if(Math.abs(nx-x) == 2 && Math.abs(ny-y) == 2 && check_center == 'n'){
 			char temp = chess_board[ny][nx];
 			if(temp == 'n'){
 				chess_board[ny][nx] = 'E';
@@ -205,15 +263,18 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail 2");
 				return 'f';
 			}
 		}else{
+			System.out.println("Fail 3");
 			return 'f';
 		}
 	}
 	private char moveMyHorse(int nx, int ny){
 		// Rule: 1. two skew diagonal one step; 2. no obstacle.
 		if(nx <0 || nx > 8 || ny < 0 || ny > 9){
+			System.out.println("Fail 1");
 			return 'f';
 		}
 		
@@ -226,6 +287,7 @@ public class Chessman {
 			if(nx > x){
 				ob_check = chess_board[y][x+1];
 				if(ob_check != 'n'){
+					System.out.println("Fail 2");
 					return 'f'; // obstacle
 				}else{
 					noObstacle = true;
@@ -233,6 +295,7 @@ public class Chessman {
 			}else{
 				ob_check = chess_board[y][x-1];
 				if(ob_check != 'n'){
+					System.out.println("Fail 3");
 					return 'f'; // obstacle
 				}else{
 					noObstacle = true;
@@ -248,6 +311,7 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail 4");
 				return 'f';
 			}
 		}else if((Math.abs(ny-y) == 2 && Math.abs(nx-x) == 1)){
@@ -255,6 +319,7 @@ public class Chessman {
 			if(ny > y){
 				ob_check = chess_board[y+1][x];
 				if(ob_check != 'n'){
+					System.out.println("Fail 5");
 					return 'f'; // obstacle
 				}else{
 					noObstacle = true;
@@ -262,6 +327,7 @@ public class Chessman {
 			}else{
 				ob_check = chess_board[y-1][x];
 				if(ob_check != 'n'){
+					System.out.println("Fail 6");
 					return 'f'; // obstacle
 				}else{
 					noObstacle = true;
@@ -277,15 +343,18 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail 7");
 				return 'f';
 			}
 		}else{
+			System.out.println("Fail 8");
 			return 'f';
 		}
 	}
 	private char moveUrHorse(int nx, int ny){
 		// Rule: 1. two skew diagonal one step; 2. no obstacle.
 		if(nx <0 || nx > 8 || ny < 0 || ny > 9){
+			System.out.println("Fail 1");
 			return 'f';
 		}
 		
@@ -298,6 +367,7 @@ public class Chessman {
 			if(nx > x){
 				ob_check = chess_board[y][x+1];
 				if(ob_check != 'n'){
+					System.out.println("Fail 2");
 					return 'f'; // obstacle
 				}else{
 					noObstacle = true;
@@ -305,6 +375,7 @@ public class Chessman {
 			}else{
 				ob_check = chess_board[y][x-1];
 				if(ob_check != 'n'){
+					System.out.println("Fail 3");
 					return 'f'; // obstacle
 				}else{
 					noObstacle = true;
@@ -320,6 +391,7 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail 4");
 				return 'f';
 			}
 		}else if((Math.abs(ny-y) == 2 && Math.abs(nx-x) == 1)){
@@ -327,6 +399,7 @@ public class Chessman {
 			if(ny > y){
 				ob_check = chess_board[y+1][x];
 				if(ob_check != 'n'){
+					System.out.println("Fail 5");
 					return 'f'; // obstacle
 				}else{
 					noObstacle = true;
@@ -334,6 +407,7 @@ public class Chessman {
 			}else{
 				ob_check = chess_board[y-1][x];
 				if(ob_check != 'n'){
+					System.out.println("Fail 6");
 					return 'f'; // obstacle
 				}else{
 					noObstacle = true;
@@ -349,9 +423,11 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail 7");
 				return 'f';
 			}
 		}else{
+			System.out.println("Fail 8");
 			return 'f';
 		}
 	}
@@ -420,6 +496,7 @@ public class Chessman {
 	private char moveUrChariot(int nx, int ny){
 		// Rule: 1. no obstacles between source and destination.
 		if(nx <0 || nx > 8 || ny < 0 || ny > 9){
+			System.out.println("Fail 1");
 			return 'f';
 		}
 		
@@ -429,12 +506,14 @@ public class Chessman {
 			if(nx > x){
 				for(int i=x+1; i<nx; ++i){
 					if(chess_board[y][i] != 'n'){
+						System.out.println("Fail 2");
 						return 'f'; // obstacle
 					}
 				}
 			}else if(x > nx){
 				for(int i=nx+1; i<x; ++i){
 					if(chess_board[y][i] != 'n'){
+						System.out.println("Fail 3");
 						return 'f'; // obstacle
 					}
 				}
@@ -448,18 +527,21 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail 4");
 				return 'f';
 			}
 		}else if(Math.abs(ny-y) > 0 && nx == x){
 			if(ny > y){
 				for(int i=y+1; i<ny; ++i){
 					if(chess_board[i][x] != 'n'){
+						System.out.println("Fail 5");
 						return 'f'; // obstacle
 					}
 				}
 			}else if(y > ny){
 				for(int i=ny+1; i<y; ++i){
 					if(chess_board[i][x] != 'n'){
+						System.out.println("Fail 6");
 						return 'f'; // obstacle
 					}
 				}
@@ -473,14 +555,17 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail 7");
 				return 'f';
 			}
 		}
+		System.out.println("Fail 8");
 		return 'f';
 	}
 	private char moveMyCannon(int nx, int ny){
 		// Rule: 1. if no obstacle, can move but not eat; 2. if 1 obstacle, can fly and eat.
 		if(nx <0 || nx > 8 || ny < 0 || ny > 9){
+			System.out.println("Fail 1");
 			return 'f';
 		}
 		
@@ -515,6 +600,7 @@ public class Chessman {
 				}
 			}
 		}else{
+			System.out.println("Fail 2");
 			return 'f';
 		}
 		
@@ -529,12 +615,14 @@ public class Chessman {
 			chess_board[y][x] = 'n';
 			return 'e';
 		}else{
+			System.out.println("Fail 3");
 			return 'f';
 		}
 	}
 	private char moveUrCannon(int nx, int ny){
 		// Rule: 1. if no obstacle, can move but not eat; 2. if 1 obstacle, can fly and eat.
 		if(nx <0 || nx > 8 || ny < 0 || ny > 9){
+			System.out.println("Fail 1");
 			return 'f';
 		}
 		
@@ -569,6 +657,7 @@ public class Chessman {
 				}
 			}
 		}else{
+			System.out.println("Fail 2");
 			return 'f';
 		}
 		
@@ -583,12 +672,14 @@ public class Chessman {
 			chess_board[y][x] = 'n';
 			return 'e';
 		}else{
+			System.out.println("Fail 3");
 			return 'f';
 		}
 	}
 	private char moveMySoldier(int nx, int ny){
 		// Rule: 1. only move forward; 2. upgrade after cross the river
 		if(nx < 0 || nx > 8 || ny < 0 || ny > 5){
+			System.out.println("Fail 1");
 			return 'f';
 		}
 		if(ny-y == 1 && nx == x){
@@ -605,6 +696,7 @@ public class Chessman {
 					chess_board[y][x] = 'n';
 					return 'e';
 				}else{
+					System.out.println("Fail 2");
 					return 'f';
 				}
 			}else{
@@ -617,15 +709,18 @@ public class Chessman {
 					chess_board[y][x] = 'n';
 					return 'e';
 				}else{
+					System.out.println("Fail 3");
 					return 'f';
 				}
 			}
 		}else{
+			System.out.println("Fail 4");
 			return 'f';
 		}
 	}
 	private char moveUrSoldier(int nx, int ny){
 		if(nx < 0 || nx > 8 || ny < 4 || ny > 9){
+			System.out.println("Fail 1");
 			return 'f';
 		}
 		if(y-ny == 1 && nx == x){
@@ -642,6 +737,7 @@ public class Chessman {
 					chess_board[y][x] = 'n';
 					return 'e';
 				}else{
+					System.out.println("Fail 2");
 					return 'f';
 				}
 			}else{
@@ -654,16 +750,19 @@ public class Chessman {
 					chess_board[y][x] = 'n';
 					return 'e';
 				}else{
+					System.out.println("Fail 3");
 					return 'f';
 				}
 			}
 		}else{
+			System.out.println("Fail 4");
 			return 'f';
 		}
 	}
 	private char moveMyBigSoldier(int nx, int ny){
 		// Rule: 1. move left, right, forward
 		if(nx < 0 || nx > 8 || ny < 5 || ny > 9){
+			System.out.println("Fail 1");
 			return 'f';
 		}
 		
@@ -678,13 +777,16 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail 2");
 				return 'f';
 			}
 		}
+		System.out.println("Fail 3");
 		return 'f';
 	}
 	private char moveUrBigSoldier(int nx, int ny){
 		if(nx < 0 || nx > 8 || ny < 0 || ny > 4){
+			System.out.println("Fail 1");
 			return 'f';
 		}
 		
@@ -699,13 +801,69 @@ public class Chessman {
 				chess_board[y][x] = 'n';
 				return 'e';
 			}else{
+				System.out.println("Fail 2");
 				return 'f';
 			}
 		}
+		System.out.println("Fail 3");
 		return 'f';
 	}
 	
-
+	@Override
+    public String toString() {
+		String name = "n";
+        switch(type){
+        case 'g':
+        	name = "將";
+			break;
+		case 'G':
+			name = "帥";
+			break;
+		case 'a':
+			name = "士";
+			break;
+		case 'A':
+			name = "仕";
+			break;
+		case 'e':
+			name = "象";
+			break;
+		case 'E':
+			name = "相";
+			break;
+		case 'h':
+			name = "馬";
+			break;
+		case 'H':
+			name = "傌";
+			break;
+		case 'r':
+			name = "車";
+			break;
+		case 'R':
+			name = "俥";
+			break;
+		case 'c':
+			name = "砲";
+			break;
+		case 'C':
+			name = "炮";
+			break;
+		case 's':
+			name = "卒";
+			break;
+		case 'S':
+			name = "兵";
+			break;
+		case 'b':
+			name = "卒";
+			break;
+		case 'B':
+			name = "兵";
+        }
+        name += "("+Integer.toString(x)+", "+Integer.toString(y)+") ";
+        return name;
+    }
 
 
 }
