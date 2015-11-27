@@ -688,10 +688,12 @@ public class Chessman {
 			if(y == 4){
 				// upgrade soldier
 				if(dest == 'n'){
+					upgradeSoldier();
 					chess_board[ny][nx] = 'b';
 					chess_board[y][x] = 'n';
 					return 's';
 				}else if(Character.toLowerCase(dest) != dest){
+					upgradeSoldier();
 					chess_board[ny][nx] = 'b';
 					chess_board[y][x] = 'n';
 					return 'e';
@@ -726,13 +728,15 @@ public class Chessman {
 		if(y-ny == 1 && nx == x){
 			char dest = chess_board[ny][nx];
 			
-			if(y == 4){
+			if(y == 5){
 				// upgrade soldier
 				if(dest == 'n'){
+					upgradeSoldier();
 					chess_board[ny][nx] = 'B';
 					chess_board[y][x] = 'n';
 					return 's';
 				}else if(Character.toUpperCase(dest) != dest){
+					upgradeSoldier();
 					chess_board[ny][nx] = 'B';
 					chess_board[y][x] = 'n';
 					return 'e';
