@@ -1,30 +1,40 @@
-import java.util.ArrayList;
+import java.util.HashMap;
+
 
 public class ChessNode {
-	private char[][] chess_board; // state
-	private boolean isMyTurn; // Machine's turn
-	private ArrayList<Chessman> chessman_list;
 	private ChessNode parent_node;
+	
+	private int p_key;
+	private int[] from;
+	private int[] dest;
+	private boolean isMyTurn; // Machine's move
+	
+	private int value; // will get assigned during evaluation process
 	private int depth;
-	
-	private int h; // estimated cost to goal
-	private int g; // cost so far to reach this node
-	private int f; // estimated total cost of path from initial to goal
-	
+	private Chessman eaten_value;
+	private int eaten_key;
 	// root constructor
-	public ChessNode(char[][] chess_board, boolean machine_turn, ArrayList<Chessman> chessman_list){
-		this.chess_board = chess_board;
-		isMyTurn = machine_turn;
-		this.chessman_list = chessman_list;
+	public ChessNode(int piece_key, int[] from, int[] dest, boolean machine_turn){
+		p_key = piece_key;
+		this.from = from;
+		this.dest = dest;
 		parent_node = null;
+		value = 0;
 		depth = 0;
+		isMyTurn = machine_turn;
+		eaten_value = null;
+		eaten_key = -1;
 	}
 	
 	// normal constructor
-	public ChessNode(char[][] chess_board, boolean machine_turn, ArrayList<Chessman> chessman_list, ChessNode parent){
-		this.chess_board = chess_board;
+	public ChessNode(int piece_key, int[] from, int[] dest, boolean machine_turn, ChessNode parent){
+		p_key = piece_key;
+		this.from = from;
+		this.dest = dest;
+		value = 0;
 		isMyTurn = machine_turn;
-		this.chessman_list = chessman_list;
+		eaten_value = null;
+		eaten_key = -1;
 		if(parent != null){
 			parent_node = parent;
 			depth = 1 + parent.getDepth();
@@ -33,34 +43,81 @@ public class ChessNode {
 			depth = 0;
 		}
 	}
+	// check game status: p - play, w - win, l - lose
+	public char checkStatus(HashMap<Integer, Chessman> piece_list){
+		if(piece_list.containsKey(1)){
+			if(piece_list.containsKey(21)){
+				return 'p';
+			}else{
+				return 'l';
+			}
+		}
+		return 'w';
+	}
+	public void move(char[][] chess_board, int[][] chess_board_key, HashMap<Integer, Chessman> piece_list){
+		if(chess_board_key[dest[1]][dest[0]] != 0){
+			eaten_key = chess_board_key[dest[1]][dest[0]];
+			eaten_value = piece_list.get(eaten_key);
+			piece_list.remove(eaten_key);
+		}
+		
+		if((isMyTurn && from[1] == 4) || (!isMyTurn && from[1] == 5)){
+			// upgrade soldier to big soldier
+			chess_board[dest[1]][dest[0]] = isMyTurn? 'b':'B';
+		}else{
+			chess_board[dest[1]][dest[0]] = chess_board[from[1]][from[0]];
+		}
+		chess_board_key[dest[1]][dest[0]] = chess_board_key[from[1]][from[0]];
+		chess_board[from[1]][from[0]] = 'n';
+		chess_board_key[from[1]][from[0]] = 0;
+	}
+	public void revert(char[][] chess_board, int[][] chess_board_key, HashMap<Integer, Chessman> piece_list){
+		if((isMyTurn && from[1] == 4) || (!isMyTurn && from[1] == 5)){
+			// degrade big soldier to soldier
+			chess_board[from[1]][from[0]] = isMyTurn? 's':'S';
+		}else{
+			chess_board[from[1]][from[0]] = chess_board[dest[1]][dest[0]];
+		}
+		chess_board_key[from[1]][from[0]] = chess_board_key[dest[1]][dest[0]];
+		
+		if(eaten_key != -1){
+			piece_list.put(eaten_key, eaten_value);
+			chess_board[dest[1]][dest[0]] = eaten_value.getType();
+			chess_board_key[dest[1]][dest[0]] = eaten_key;
+		}else{
+			chess_board[dest[1]][dest[0]] = 'n';
+			chess_board_key[dest[1]][dest[0]] = 0;
+		}
+	}
 	
-	public char[][] getChessBoard(){
-		return chess_board;
+	public void setValue(int v){
+		value = v;
 	}
-	public boolean isMachineTurn(){
-		return isMyTurn;
+	public int getPieceKey(){
+		return p_key;
 	}
-	public ArrayList<Chessman> getChessmanList(){
-		return chessman_list;
+	public int getValue(){
+		return value;
 	}
 	public ChessNode getParent(){
 		return parent_node;
 	}
+	public boolean isMachineTurn(){
+		return isMyTurn;
+	}
 	public int getDepth(){
 		return depth;
 	}
+	public int[] getFrom(){
+		return from;
+	}
+	public int[] getDest(){
+		return dest;
+	}
+	@Override
+	public String toString(){
+		String line = "key: "+p_key+", from("+from[0]+","+from[1]+"), to("+dest[0]+","+dest[1]+"), value: "+value+", depth: "+depth+", eate key: "+eaten_key;
+		return line;
+	}
 
-	// check game status: p - play, w - win, l - lose, t - tie
-	public char getGameStatus(){
-		char st = 'p';
-		
-		return st;
-	}
-	
-	// Estimation of the current state of the game -> Search through moves and pick the “best” one.
-	public int getEvaluation(){
-		int sum = 0;
-		
-		return sum;
-	}
 }
